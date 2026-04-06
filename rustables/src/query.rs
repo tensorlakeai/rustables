@@ -1,4 +1,4 @@
-use std::os::{fd::AsRawFd, unix::prelude::RawFd};
+use std::os::{fd::{AsRawFd, IntoRawFd}, unix::prelude::RawFd};
 
 use nix::sys::socket::{self, AddressFamily, MsgFlags, SockFlag, SockProtocol, SockType};
 
