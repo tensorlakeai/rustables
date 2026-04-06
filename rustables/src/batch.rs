@@ -116,7 +116,12 @@ impl Batch {
                 .map_err(QueryError::NetlinkSendError)?;
         }
 
-        Ok(socket_close_wrapper(sock.as_raw_fd(), move |sock| {
+        // Use into_raw_fd() to transfer ownership of the fd to socket_close_wrapper,
+        // which closes it explicitly via nix::unistd::close().  Using as_raw_fd()
+        // here would cause a double-close: socket_close_wrapper closes the fd once,
+        // and then the OwnedFd drop closes it again, triggering an IO Safety
+        // violation abort on Rust 1.87+ (EBADF from the second close()).
+        Ok(socket_close_wrapper(sock.into_raw_fd(), move |sock| {
             recv_and_process(sock, Some(max_seq), None, &mut ())
         })?)
     }

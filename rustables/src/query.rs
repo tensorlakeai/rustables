@@ -156,7 +156,9 @@ where
     socket::send(sock.as_raw_fd(), &chains_buf, MsgFlags::empty())
         .map_err(QueryError::NetlinkSendError)?;
 
-    socket_close_wrapper(sock.as_raw_fd(), move |sock| {
+    // Use into_raw_fd() — see the comment in batch.rs Batch::send() for why
+    // as_raw_fd() would cause a double-close IO Safety abort on Rust 1.87+.
+    socket_close_wrapper(sock.into_raw_fd(), move |sock| {
         // the kernel should return NLM_F_MULTI objects
         recv_and_process(
             sock,
