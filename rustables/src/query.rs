@@ -145,7 +145,7 @@ where
     let sock = socket::socket(
         AddressFamily::Netlink,
         SockType::Raw,
-        SockFlag::empty(),
+        SockFlag::SOCK_CLOEXEC,
         SockProtocol::NetlinkNetFilter,
     )
     .map_err(QueryError::NetlinkOpenError)?;
